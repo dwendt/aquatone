@@ -23,6 +23,7 @@ require "aquatone/report"
 require "aquatone/command"
 require "aquatone/collector"
 require "aquatone/detector"
+require "aquatone/iprange"
 
 module Aquatone
   AQUATONE_ROOT         = File.expand_path(File.join(File.dirname(__FILE__), "..")).freeze

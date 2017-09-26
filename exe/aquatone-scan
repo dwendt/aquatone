@@ -5,7 +5,9 @@ require "aquatone"
 options = {
   :ports   => Aquatone::PortLists::MEDIUM,
   :threads => 5,
-  :timeout => 0.5
+  :timeout => 0.5,
+  :whitelist => [],
+  :blacklist => []
 }
 
 OptionParser.new do |opts|
@@ -37,6 +39,28 @@ OptionParser.new do |opts|
         exit 1
       end
     end
+  end
+
+  opts.on("-w", "--whitelist IP,Ranges,CIDRs", "List of IP/mask restrictions that hosts.json will be tested against. Defaults to permitting all.") do |v|
+    ranges = Aquatone::IPRange.parse(v)
+
+    if ranges == []
+      puts "Failed to parse IP list. Valid formats look like: 10.0.0.1, 10.0.0-255.1, 10.0.*.1, 10.0.0.1/24"
+      exit 1
+    end
+
+    options[:whitelist] = ranges
+  end
+
+  opts.on("-b", "--blacklist IP,Ranges,CIDRs", "List of IP/mask restrictions that will not be scanned when they appear in hosts.json. Takes precedence over whitelist.") do |v|
+    ranges = Aquatone::IPRange.parse(v)
+
+    if ranges == []
+      puts "Failed to parse IP list. Valid formats look like: 10.0.0.1, 10.0.0-255.1, 10.0.*.1, 10.0.0.1/24"
+      exit 1
+    end
+
+    options[:blacklist] = ranges
   end
 
   opts.on("--timeout SECONDS", "Timeout in seconds for port probes") do |v|

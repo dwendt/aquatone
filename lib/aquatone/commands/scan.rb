@@ -29,6 +29,11 @@ module Aquatone
         hosts = JSON.parse(@assessment.read_file("hosts.json"))
         output("Loaded #{bold(hosts.count)} hosts from #{bold(File.join(@assessment.path, 'hosts.json'))}\n\n")
         hosts.each_pair do |domain, ip|
+
+          # whitelist -> blacklist so you can scan 10.0.0.0/24 and not 10.0.0.1
+          next if options[:whitelist] != [] and not Aquatone::IPRange.contains(options[:whitelist], ip)
+          next if options[:blacklist] != [] and Aquatone::IPRange.contains(options[:blacklist], ip)
+
           if !@host_dictionary.key?(ip)
             @host_dictionary[ip] = [domain]
             options[:ports].each do |port|
